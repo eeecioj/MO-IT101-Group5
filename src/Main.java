@@ -32,9 +32,6 @@ public class Main {
     public static void main(String[] args) {
         ArrayList<Employee> employees = new ArrayList<>();
         Scanner scanner = new Scanner(System.in);
-
-        // Display the title
-        System.out.println("MotorPH Payroll System");
         
         // Add employee 1
         employees.add(new Employee(1, "Manuel Garcia III", 535.71));        
@@ -104,13 +101,15 @@ public class Main {
         employees.add(new Employee(33, "Carlos Ian Martinez", 313.51));
         // Add employee 34
         employees.add(new Employee(34, "Beatriz Santos", 313.51));
+        
+        // Display the title
+        System.out.println("MotorPH Payroll System");
      
-
         // Validate employee ID
         int employeeId;
         boolean validEmployeeId = false;
         do {
-            System.out.println("Enter your employee ID:");
+            System.out.println("\nEnter your employee ID:");
             employeeId = scanner.nextInt();
             for (Employee employee : employees) {
                 if (employee.getId() == employeeId) {
@@ -119,7 +118,7 @@ public class Main {
                 }
             }
             if (!validEmployeeId) {
-                System.out.println("Invalid employee ID. Please try again.");
+                System.out.println("\nInvalid employee ID. Please try again.");
             }
         } while (!validEmployeeId);
         
@@ -127,8 +126,11 @@ public class Main {
         System.out.println("\n--------------------------------------");
         System.out.println("EMPLOYEE INFORMATION:");
         System.out.println("--------------------------------------");
+        
+        Employee selectedEmployee = null; // To hold the reference of the selected employee
         for (Employee employee : employees) {
             if (employee.getId() == employeeId) {
+                selectedEmployee = employee; // Save the selected employee for later use
                 System.out.println("Employee ID: " + employee.getId());
                 System.out.println("Name: " + employee.getName());
                 System.out.println("Hourly Rate: Php" + employee.getHourlyRate());
@@ -162,81 +164,59 @@ public class Main {
         }
 
         // Calculate weekly and monthly salary
-        Employee selectedEmployee = null;
-        for (Employee employee : employees) {
-            if (employee.getId() == employeeId) {
-                selectedEmployee = employee;
-                break;
-            }
+        double weeklySalary = selectedEmployee.getHourlyRate() * totalHoursWorked;
+        double monthlySalary = weeklySalary * 4; // Assuming 4 weeks in a month
+
+        // Calculate deductions and withholding tax
+        double philHealthDeduction = monthlySalary * 0.03; // 3% of monthly salary
+        double pagIbigDeduction = monthlySalary * 0.02; // 2% of monthly salary
+        double sssDeduction = 0; // Adjust based on monthly salary range
+        double withholdingTax = 0; // Adjust based on monthly salary range
+        double totalDeductions = philHealthDeduction + pagIbigDeduction + sssDeduction + withholdingTax;
+        double netSalary = monthlySalary - totalDeductions;
+
+        // Deduct SSS based on monthly salary range
+        if (monthlySalary >= 22250 && monthlySalary < 22750) {
+            sssDeduction = 1012.50;
+        } else if (monthlySalary >= 22750 && monthlySalary < 23250) {
+            sssDeduction = 1035;
+        } else if (monthlySalary >= 23250 && monthlySalary < 23750) {
+            sssDeduction = 1057.50;
+        } else if (monthlySalary >= 23750 && monthlySalary < 24250) {
+            sssDeduction = 1080;
+        } else if (monthlySalary >= 24250 && monthlySalary < 24750) {
+            sssDeduction = 1102.50;
+        } else if (monthlySalary >= 24750) {
+            sssDeduction = 1125;
         }
 
-        if (selectedEmployee != null) {
-            double weeklySalary = selectedEmployee.getHourlyRate() * totalHoursWorked;
-            double monthlySalary = weeklySalary * 4; // Assuming 4 weeks in a month
-
-            // Calculate deductions and withholding tax
-            double philHealthDeduction = monthlySalary * 0.03; // 3% of monthly salary
-            double pagIbigDeduction = monthlySalary * 0.02; // 2% of monthly salary
-            double sssDeduction = 0; // Adjust based on monthly salary range
-            double withholdingTax = 0; // Adjust based on monthly salary range
-
-            // Deduct SSS based on monthly salary range
-            if (monthlySalary >= 22250 && monthlySalary < 22750) {
-                sssDeduction = 1012.50;
-            } else if (monthlySalary >= 22750 && monthlySalary < 23250) {
-                sssDeduction = 1035;
-            } else if (monthlySalary >= 23250 && monthlySalary < 23750) {
-                sssDeduction = 1057.50;
-            } else if (monthlySalary >= 23750 && monthlySalary < 24250) {
-                sssDeduction = 1080;
-            } else if (monthlySalary >= 24250 && monthlySalary < 24750) {
-                sssDeduction = 1102.50;
-            } else if (monthlySalary >= 24750) {
-                sssDeduction = 1125;
-            }
-            
-            
-            // Calculate government deductions
-            double govtDeductions = philHealthDeduction + pagIbigDeduction + sssDeduction;
-
-            // Calculate taxable income
-            double taxableIncome = monthlySalary - govtDeductions;
-            
-            // Calculate withholding tax based on monthly salary range
-            if (taxableIncome >= 20833 && taxableIncome < 33333) {
-                withholdingTax = (taxableIncome - 20833) * 0.20;
-            } else if (taxableIncome >= 33333 && taxableIncome < 66667) {
-                withholdingTax = (taxableIncome - 33333) * 0.25;
-            } else if (taxableIncome >= 66667 && taxableIncome < 166667) {
-                withholdingTax = (taxableIncome - 33333) * 0.30;
-            }
-
-            // Calculate total deductions
-            double totalDeductions = govtDeductions + withholdingTax;
-            
-            // Calculate net salary
-            double netSalary = taxableIncome - withholdingTax;
-
-            // Display employee information and salary details
-            System.out.println("\n--------------------------------------");
-            System.out.println("EMPLOYEE PAYSLIP");
-            System.out.println("--------------------------------------");
-            
-            System.out.println("\nTotal Hours Worked: " + totalHoursWorked);
-            System.out.println("Weekly Salary: Php" + weeklySalary);
-            System.out.println("--------------------------------------");
-            System.out.println("GROSS INCOME: Php" + monthlySalary);
-            System.out.println("--------------------------------------");
-            System.out.println("\nPhilHealth: Php" + philHealthDeduction);
-            System.out.println("Pag-IBIG: Php" + pagIbigDeduction);
-            System.out.println("Social Security System: Php" + sssDeduction);
-            System.out.println("Withholding Tax: Php" + withholdingTax);
-            System.out.println("--------------------------------------");
-            System.out.println("TOTAL DEDUCTIONS :Php " + totalDeductions);
-            System.out.println("--------------------------------------");
-            System.out.println("\n*****TAKE HOME PAY: Php" + netSalary + "*****");
-        } else {
-            System.out.println("Employee not found.");
+        // Calculate withholding tax based on monthly salary range
+        double taxableIncome = monthlySalary - (philHealthDeduction + pagIbigDeduction + sssDeduction);
+        if (taxableIncome >= 20833 && taxableIncome < 33333) {
+            withholdingTax = (taxableIncome - 20833) * 0.20;
+        } else if (taxableIncome >= 33333 && taxableIncome < 66667) {
+            withholdingTax = (taxableIncome - 33333) * 0.25;
+        } else if (taxableIncome >= 66667 && taxableIncome < 166667) {
+            withholdingTax = (taxableIncome - 33333) * 0.30;
         }
+
+        // Display employee information and salary details
+        System.out.println("\n--------------------------------------");
+        System.out.println("EMPLOYEE PAYSLIP");
+        System.out.println("--------------------------------------");
+        System.out.println("\nTotal Hours Worked: " + totalHoursWorked);
+        System.out.println("Weekly Salary: Php" + weeklySalary);
+        System.out.println("--------------------------------------");
+        System.out.println("GROSS INCOME: Php" + monthlySalary);
+        System.out.println("--------------------------------------");
+        System.out.println("\nPhilHealth: Php" + philHealthDeduction);
+        System.out.println("Pag-IBIG: Php" + pagIbigDeduction);
+        System.out.println("Social Security System: Php" + sssDeduction);
+        System.out.println("Withholding Tax: Php" + withholdingTax);
+        System.out.println("--------------------------------------");
+        System.out.println("TOTAL DEDUCTIONS :Php " + totalDeductions);
+        System.out.println("--------------------------------------");
+        System.out.println("\n*****TAKE HOME PAY: Php" + netSalary + "*****");
     }
 }
+
