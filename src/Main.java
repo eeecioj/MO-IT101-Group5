@@ -215,7 +215,7 @@ public class Main {
             double totalDeductions = govtDeductions + withholdingTax;
             
             // Calculate net salary
-            double netSalary = taxableIncome - withholdingTax;
+            double netSalary = monthlySalary - totalDeductions;
 
             // Display employee information and salary details
             System.out.println("\n--------------------------------------");
